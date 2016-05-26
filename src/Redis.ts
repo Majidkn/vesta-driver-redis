@@ -1,44 +1,44 @@
 import {RedisClient, createClient} from "redis";
-import {Database, IDatabaseConfig} from "vesta-schema/Database";
+import {Database, IDatabaseConfig, ISchemaList} from "vesta-schema/Database";
 import {IQueryResult, IUpsertResult, IDeleteResult} from "vesta-schema/ICRUDResult";
 import {Vql, Condition} from "vesta-schema/Vql";
 import {IModelValues} from "vesta-schema/Model";
-import {Schema} from "vesta-schema/Schema";
 import {Err} from "vesta-util/Err";
 import {DatabaseError} from "vesta-schema/error/DatabaseError";
 
 export class Redis extends Database {
-    private static staticInstance:RedisClient;
+    private connection:RedisClient;
+    private schemaList:ISchemaList = {};
+    private config:IDatabaseConfig;
 
-    public static getInstance(config:IDatabaseConfig):Promise<Database> {
-        if (Redis.staticInstance) {
-            return Promise.resolve(new Redis(Redis.staticInstance));
-        }
+    public connect():Promise<Database> {
+        if (this.connection) return Promise.resolve(this);
         return new Promise<Database>((resolve, reject)=> {
-            var client = createClient(config.port, config.host);
-            client.on('ready', function () {
-                Redis.staticInstance = client;
-                resolve(new Redis(client));
+            var client = createClient(this.config.port, this.config.host);
+            client.on('ready', ()=> {
+                this.connection = client;
+                resolve(this);
                 console.log('Redis connection established');
             });
-            client.on('error', function (error) {
+            client.on('error', (error)=> {
                 reject(error);
                 console.log('Redis Error', error);
             });
-            client.on('reconnecting', function () {
+            client.on('reconnecting', ()=> {
                 console.log('Redis connection established');
             });
         })
     }
 
-    constructor(instance:RedisClient) {
+    constructor(config:IDatabaseConfig, schemaList:ISchemaList) {
         super();
-        if (!instance) throw new DatabaseError(Err.Code.DBConnection);
+        this.schemaList = schemaList;
+        this.config = config;
     }
 
     findById<T>(id:string):Promise<IQueryResult<T>> {
         return new Promise<IUpsertResult<T>>((resolve, reject)=> {
-            Redis.staticInstance.get(id, (err, reply)=> {
+            this.connection.get(id, (err, reply)=> {
                 if (err) return reject(new DatabaseError(Err.Code.DBInsert, err.message));
                 var data = null;
                 if (reply) {
@@ -65,7 +65,7 @@ export class Redis extends Database {
 
     insertOne<T>(model:string, value:T):Promise<IUpsertResult<T>> {
         return new Promise<IUpsertResult<T>>((resolve, reject)=> {
-            Redis.staticInstance.set(model, value, (err)=> {
+            this.connection.set(model, value, (err)=> {
                 if (err) return reject(new DatabaseError(Err.Code.DBInsert, err.message));
                 resolve();
             });
@@ -88,7 +88,7 @@ export class Redis extends Database {
         return undefined;
     }
 
-    init(schemaList:Array<Schema>) {
+    init() {
         return undefined;
     }
 }
