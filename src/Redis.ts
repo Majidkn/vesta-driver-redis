@@ -1,5 +1,5 @@
 import {RedisClient, createClient} from "redis";
-import {Database, IDatabaseConfig, ISchemaList} from "vesta-schema/Database";
+import {Database, IDatabaseConfig, ISchemaList, IModelCollection} from "vesta-schema/Database";
 import {IQueryResult, IUpsertResult, IDeleteResult} from "vesta-schema/ICRUDResult";
 import {Vql, Condition} from "vesta-schema/Vql";
 import {IModelValues} from "vesta-schema/Model";
@@ -9,6 +9,7 @@ import {DatabaseError} from "vesta-schema/error/DatabaseError";
 export class Redis extends Database {
     private connection:RedisClient;
     private schemaList:ISchemaList = {};
+    private models:IModelCollection = {};
     private config:IDatabaseConfig;
 
     public connect():Promise<Database> {
@@ -30,9 +31,16 @@ export class Redis extends Database {
         })
     }
 
-    constructor(config:IDatabaseConfig, schemaList:ISchemaList) {
+    constructor(config:IDatabaseConfig, models:IModelCollection) {
         super();
+        var schemaList:ISchemaList = {};
+        for (var model in models) {
+            if (models.hasOwnProperty(model)) {
+                schemaList[model] = models[model].schema;
+            }
+        }
         this.schemaList = schemaList;
+        this.models = models;
         this.config = config;
     }
 
@@ -70,6 +78,10 @@ export class Redis extends Database {
                 resolve();
             });
         })
+    }
+
+    insertAll<T>(model:string, values:Array<T>):Promise<IUpsertResult<T>> {
+        return undefined;
     }
 
     updateOne<T>(model:string, value:T):Promise<IUpsertResult<T>> {
