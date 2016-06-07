@@ -44,21 +44,19 @@ export class Redis extends Database {
         this.config = config;
     }
 
-    findById<T>(id:string):Promise<IQueryResult<T>> {
-        return new Promise<IUpsertResult<T>>((resolve, reject)=> {
+    findById<T>(id:string):Promise<IQueryResult<T|string>> {
+        return new Promise<IQueryResult<T|string>>((resolve, reject)=> {
             this.connection.get(id, (err, reply)=> {
+                var result:IQueryResult<T|string> = <IQueryResult<T|string>>{};
                 if (err) return reject(new DatabaseError(Err.Code.DBInsert, err.message));
-                var data = null;
                 if (reply) {
                     try {
-                        data = <T>JSON.parse(reply);
+                        result.items = [<T>JSON.parse(reply)]
                     } catch (e) {
-                        data = reply;
+                        result.items = [reply];
                     }
-                    resolve(data);
-                } else {
-                    resolve(null);
                 }
+                resolve(result);
             });
         })
     }
