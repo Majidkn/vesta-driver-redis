@@ -8,5 +8,9 @@
   "files": [
     "typings/tsd.d.ts",
     "src/Redis.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "package"
   ]
 }
