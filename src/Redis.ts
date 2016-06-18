@@ -48,6 +48,7 @@ export class Redis extends Database {
         return new Promise<IQueryResult<T|string>>((resolve, reject)=> {
             this.connection.get(id, (err, reply)=> {
                 var result:IQueryResult<T|string> = <IQueryResult<T|string>>{};
+                result.items = [];
                 if (err) return reject(new DatabaseError(Err.Code.DBInsert, err.message));
                 if (reply) {
                     try {
