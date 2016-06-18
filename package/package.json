@@ -1,6 +1,6 @@
 {
   "name": "vesta-driver-redis",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Vesta Platform Redis drievr based on Database Class",
   "keywords": [
     "NodeJS",
