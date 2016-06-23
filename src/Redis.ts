@@ -102,4 +102,8 @@ export class Redis extends Database {
     init() {
         return undefined;
     }
+
+    query<T>(query:string):Promise<T> {
+        return undefined;
+    } 
 }
