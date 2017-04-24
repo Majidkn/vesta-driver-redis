@@ -6,7 +6,6 @@
     "outDir": "package/"
   },
   "files": [
-    "typings/tsd.d.ts",
     "src/Redis.ts"
   ],
   "exclude": [

@@ -7,7 +7,7 @@ import {
     Vql
 } from "vesta-lib";
 
-export class Redis extends Database {
+export class Redis implements Database {
     close(connection: any): Promise<boolean> {
         return Promise.reject(false);
     }
@@ -47,7 +47,6 @@ export class Redis extends Database {
     }
 
     constructor(config: IDatabaseConfig, models: IModelCollection) {
-        super();
         let schemaList: ISchemaList = {};
         for (let model in models) {
             if (models.hasOwnProperty(model)) {
