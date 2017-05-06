@@ -34,7 +34,7 @@
     "@types/node": "^7.0.13",
     "@types/redis": "^0.12.36",
     "redis": "^2.5.3",
-    "vesta-lib": "^0.2.2"
+    "vesta-lib": "^0.3.0-beta.4"
   },
   "devDependencies": {}
 }

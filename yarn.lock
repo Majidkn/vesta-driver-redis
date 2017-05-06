@@ -36,6 +36,6 @@ redis@^2.5.3:
     redis-commands "^1.2.0"
     redis-parser "^2.0.0"
 
-vesta-lib@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/vesta-lib/-/vesta-lib-0.2.2.tgz#80044bfa48da1af4390fe8665f280b4d214b7a00"
+vesta-lib@^0.3.0-beta.4:
+  version "0.3.0-beta.4"
+  resolved "https://registry.yarnpkg.com/vesta-lib/-/vesta-lib-0.3.0-beta.4.tgz#2c6d05c360b8ce344210d2eb2c308074d9df4c15"

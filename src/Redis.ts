@@ -1,35 +1,20 @@
 import {RedisClient, createClient} from "redis";
 import {
-    Condition,
-    Database, DatabaseError, Err, IDatabaseConfig, IDeleteResult, IModelCollection, IModelValues, IQueryOption,
-    IQueryResult,
-    ISchemaList, IUpsertResult,
-    Vql
+    DatabaseError, Err, IDatabaseConfig, IDeleteResult,
+    IQueryResult, IUpsertResult, KeyValueDatabase
 } from "vesta-lib";
 
-export class Redis implements Database {
-    close(connection: any): Promise<boolean> {
-        return Promise.reject(false);
-    }
-
-    count<T>(model: string, modelValues: T, option?: IQueryOption): Promise<IQueryResult<T>>;
-    count<T>(query: Vql): Promise<IQueryResult<T>>;
-    count<T>(model, modelValues?, option?): Promise<IQueryResult<T>> {
-        return undefined;
-    }
-
-    increase<T>(model: string, id: number | string, field: string, value: number): Promise<IQueryResult<T>> {
-        return undefined;
-    }
-
+export class Redis implements KeyValueDatabase {
     private connection: RedisClient;
-    private schemaList: ISchemaList = {};
-    private models: IModelCollection = {};
     private config: IDatabaseConfig;
 
-    public connect(): Promise<Database> {
+    public constructor(config: IDatabaseConfig) {
+        this.config = config;
+    }
+
+    public connect(): Promise<KeyValueDatabase> {
         if (this.connection) return Promise.resolve(this);
-        return new Promise<Database>((resolve, reject) => {
+        return new Promise<KeyValueDatabase>((resolve, reject) => {
             let client = createClient(this.config.port, this.config.host);
             client.on('ready', () => {
                 this.connection = client;
@@ -46,21 +31,13 @@ export class Redis implements Database {
         })
     }
 
-    constructor(config: IDatabaseConfig, models: IModelCollection) {
-        let schemaList: ISchemaList = {};
-        for (let model in models) {
-            if (models.hasOwnProperty(model)) {
-                schemaList[model] = models[model].schema;
-            }
-        }
-        this.schemaList = schemaList;
-        this.models = models;
-        this.config = config;
+    close(connection: any): Promise<boolean> {
+        return Promise.reject(false);
     }
 
-    findById<T>(id: string): Promise<IQueryResult<T | string>> {
+    find<T>(key: number | string): Promise<IQueryResult<T>> {
         return new Promise<IQueryResult<T | string>>((resolve, reject) => {
-            this.connection.get(id, (err, reply) => {
+            this.connection.get(key, (err, reply) => {
                 let result: IQueryResult<T | string> = <IQueryResult<T | string>>{};
                 result.items = [];
                 if (err) return reject(new DatabaseError(Err.Code.DBInsert, err));
@@ -76,48 +53,23 @@ export class Redis implements Database {
         })
     }
 
-    findByModelValues<T>(model: string, modelValues: IModelValues, limit: number): Promise<IQueryResult<T>> {
-        return undefined;
-    }
-
-    findByQuery<T>(query: Vql): Promise<IQueryResult<T>> {
-        return undefined;
-    }
-
-    insertOne<T>(model: string, value: T): Promise<IUpsertResult<T>> {
+    insert<T>(key: string, value: T): Promise<IUpsertResult<T>> {
         return new Promise<IUpsertResult<T>>((resolve, reject) => {
-            this.connection.set(model, value, (err) => {
+            this.connection.set(key, value, (err) => {
                 if (err) return reject(new DatabaseError(Err.Code.DBInsert, err.message));
                 resolve();
             });
         })
     }
 
-    insertAll<T>(model: string, values: Array<T>): Promise<IUpsertResult<T>> {
-        return undefined;
+    update<T>(key: string, value: T): Promise<IUpsertResult<T>> {
+        return this.insert<T>(key, value);
     }
 
-    updateOne<T>(model: string, value: T): Promise<IUpsertResult<T>> {
-        return undefined;
-    }
-
-    updateAll<T>(model: string, newValues: IModelValues, condition: Condition): Promise<IUpsertResult<T>> {
-        return undefined;
-    }
-
-    deleteOne(model: string, id: number | string): Promise<IDeleteResult> {
-        return undefined;
-    }
-
-    deleteAll(model: string, condition: Condition): Promise<IDeleteResult> {
-        return undefined;
-    }
-
-    init() {
-        return undefined;
-    }
-
-    query<T>(query: string): Promise<T> {
-        return undefined;
+    remove(key: string): Promise<IDeleteResult> {
+        return new Promise((resolve, reject) => this.connection.del(key, ((err, res) => {
+            if (err) return reject(new DatabaseError(Err.Code.DBDelete, err.message));
+            resolve();
+        })))
     }
 }
