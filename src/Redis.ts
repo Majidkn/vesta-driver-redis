@@ -2,7 +2,7 @@ import {RedisClient, createClient} from "redis";
 import {
     DatabaseError, Err, IDatabaseConfig, IDeleteResult,
     IQueryResult, IUpsertResult, KeyValueDatabase
-} from "vesta-lib";
+} from "@vesta/core";
 
 export class Redis implements KeyValueDatabase {
     private connection: RedisClient;
