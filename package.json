@@ -1,40 +1,40 @@
 {
   "name": "@vesta/driver-redis",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vesta Platform Redis drievr based on Database Class",
   "keywords": [
     "NodeJS",
     "TypeScript",
     "Database",
-    "MySQL",
+    "Redis",
     "Schema"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsc -w -p ."
+    "prepare": "gulp prepare",
+    "dev": "gulp dev:es6",
+    "publish": "gulp publish"
   },
+  "main": "index.js",
+  "typings": "index.d.ts",
   "author": "hbtb <bishehsary@gmail.com>",
   "contributors": [
-    {
-      "name": "javadkh2",
-      "email": "khalilian.javad@gmail.com"
-    }
+    "javadkh2 <khalilian.javad@gmail.com>"
   ],
   "bugs": {
     "url": "https://github.com/VestaRayanAfzar/vesta-driver-redis/issues",
     "email": "bishehsary@gmail.com"
   },
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/VestaRayanAfzar/vesta-driver-redis.git"
-  },
+  "repository": "https://github.com/VestaRayanAfzar/vesta-driver-redis.git",
   "dependencies": {
-    "@types/es6-promise": "^0.0.32",
     "@types/node": "^7.0.13",
     "@types/redis": "^0.12.36",
-    "@vesta/core": "^0.2.0",
+    "@vesta/core": "^0.2.6",
     "redis": "^2.5.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@vesta/devmaid": "^0.2.3",
+    "gulp": "^3.9.1"
+  }
 }
