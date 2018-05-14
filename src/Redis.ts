@@ -13,7 +13,7 @@ export class Redis implements KeyValueDatabase {
     }
 
     public connect(): Promise<KeyValueDatabase> {
-        if (this.connection) return Promise.resolve(this);
+        if (this.connection) return Promise.resolve(<KeyValueDatabase>this);
         return new Promise<KeyValueDatabase>((resolve, reject) => {
             let client = createClient(this.config.port, this.config.host);
             client.on('ready', () => {
@@ -35,15 +35,17 @@ export class Redis implements KeyValueDatabase {
         return Promise.reject(false);
     }
 
-    find<T>(key: number | string): Promise<IQueryResult<T>> {
+    find<T>(key: string): Promise<IQueryResult<T | string>> {
         return new Promise<IQueryResult<T | string>>((resolve, reject) => {
             this.connection.get(key, (err, reply) => {
                 let result: IQueryResult<T | string> = <IQueryResult<T | string>>{};
                 result.items = [];
-                if (err) return reject(new DatabaseError(Err.Code.DBInsert, err));
+                if (err) {
+                    return reject(new DatabaseError(Err.Code.DBInsert, err));
+                }
                 if (reply) {
                     try {
-                        result.items = [<T>JSON.parse(reply)]
+                        result.items = [<T>JSON.parse(reply)];
                     } catch (e) {
                         result.items = [reply];
                     }
@@ -53,10 +55,12 @@ export class Redis implements KeyValueDatabase {
         })
     }
 
-    insert<T>(key: string, value: T): Promise<IUpsertResult<T>> {
+    insert<T>(key: string, value: T | string): Promise<IUpsertResult<T>> {
         return new Promise<IUpsertResult<T>>((resolve, reject) => {
-            this.connection.set(key, value, (err) => {
-                if (err) return reject(new DatabaseError(Err.Code.DBInsert, err.message));
+            this.connection.set(key, <string>value, (err) => {
+                if (err) {
+                    return reject(new DatabaseError(Err.Code.DBInsert, err));
+                }
                 resolve();
             });
         })
@@ -68,7 +72,9 @@ export class Redis implements KeyValueDatabase {
 
     remove(key: string): Promise<IDeleteResult> {
         return new Promise((resolve, reject) => this.connection.del(key, ((err, res) => {
-            if (err) return reject(new DatabaseError(Err.Code.DBDelete, err.message));
+            if (err) {
+                return reject(new DatabaseError(Err.Code.DBDelete, err));
+            }
             resolve();
         })))
     }

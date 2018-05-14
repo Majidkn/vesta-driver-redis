@@ -10,13 +10,11 @@
     "Schema"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "gulp prepare",
-    "dev": "gulp dev:es6",
-    "publish": "gulp publish"
+    "dev": "gulp dev[es6]",
+    "deploy": "gulp publish"
   },
-  "main": "index.js",
-  "typings": "index.d.ts",
+  "main": "Redis.js",
+  "typings": "Redis.d.ts",
   "author": "hbtb <bishehsary@gmail.com>",
   "contributors": [
     "javadkh2 <khalilian.javad@gmail.com>"
@@ -28,13 +26,15 @@
   "license": "Apache-2.0",
   "repository": "https://github.com/VestaRayanAfzar/vesta-driver-redis.git",
   "dependencies": {
-    "@types/node": "^7.0.13",
-    "@types/redis": "^0.12.36",
-    "@vesta/core": "^0.2.6",
-    "redis": "^2.5.3"
+    "@vesta/core": "^1.1.7",
+    "redis": "^2.8.0"
   },
   "devDependencies": {
-    "@vesta/devmaid": "^0.2.3",
-    "gulp": "^3.9.1"
-  }
+    "@types/node": "^9.4.6",
+    "@types/redis": "^2.8.5",
+    "@vesta/devmaid": "^0.3.3",
+    "gulp": "^3.9.1",
+    "tslint": "^5.9.1"
+  },
+  "private": true
 }

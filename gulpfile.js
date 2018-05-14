@@ -1,20 +1,19 @@
-const vesta = require('@vesta/devmaid');
+const vesta = require("@vesta/devmaid");
+const gulp = require("gulp");
 
-const config = {
-    src: 'src',
-    genIndex: true,
-    targets: ['es6'],
-    files: ['.npmignore', 'LICENSE', 'README.md'],
+const pkgr = new vesta.Packager({
+    root: __dirname,
+    src: "src",
+    targets: ["es6"],
+    files: [".npmignore", "LICENSE", "README.md"],
+    publish: "--access=public",
     transform: {
-        package: (json, target) => {
-            delete json.dependencies['@types/node'];
-            delete json.dependencies['@types/redis'];
-            delete json.scripts;
-            delete json.devDependencies;
-        }
-    },
-    publish: '--access=public'
-};
+        package: function (package, target, isProduction) {
+            if (isProduction) {
+                delete package.private;
+            }
+        },
+    }
+});
 
-const aid = new vesta.TypescriptTarget(config);
-aid.createTasks();
+pkgr.createTasks();
