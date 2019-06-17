@@ -15,7 +15,7 @@ export class Redis implements KeyValueDatabase {
     public connect(): Promise<KeyValueDatabase> {
         if (this.connection) return Promise.resolve(<KeyValueDatabase>this);
         return new Promise<KeyValueDatabase>((resolve, reject) => {
-            let client = createClient(this.config.port, this.config.host);
+            let client = createClient(this.config.port, this.config.host, { auth_pass: this.config.password });
             client.on('ready', () => {
                 this.connection = client;
                 resolve(this);
